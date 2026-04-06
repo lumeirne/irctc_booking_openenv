@@ -1,0 +1,22 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+myenv
+.python-version
+
+# txt
+cmds.txt
+pre_validation_*.txt
+
+
+.kiro
+DEPLOY_TO_HF.md
+*_hf.py
+.pytest_cache
+.env
