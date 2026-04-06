@@ -6,7 +6,7 @@ from enum import Enum
 from typing import Any, Dict, List, Literal, Optional
 
 from openenv.core.env_server.types import Action, Observation, State
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class GenderEnum(str, Enum):
@@ -141,6 +141,17 @@ class GroundTruth(BaseModel):
 class IrctcBookingAction(Action):
     action_type: ActionTypeEnum
     params: Dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator('params', mode='before')
+    @classmethod
+    def parse_params_from_string(cls, v):
+        if isinstance(v, str):
+            import json
+            try:
+                return json.loads(v)
+            except json.JSONDecodeError:
+                return {}
+        return v
 
 
 class IrctcBookingObservation(Observation):

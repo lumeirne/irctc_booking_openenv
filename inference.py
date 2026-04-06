@@ -22,9 +22,9 @@ from irctc_booking.models import ActionTypeEnum, IrctcBookingAction, IrctcBookin
 from dotenv import load_dotenv
 load_dotenv()
 
-API_BASE_URL = os.getenv("API_BASE_URL", "https://api.groq.com/openai/v1")
-MODEL_NAME = os.getenv("MODEL_NAME", "qwen/qwen3-32b")
-OEPNAI_API_KEY = os.getenv("OEPNAI_API_KEY")
+API_BASE_URL = os.getenv("API_BASE_URL", "https://router.huggingface.co/v1")
+MODEL_NAME = os.getenv("MODEL_NAME", "Qwen/Qwen2.5-72B-Instruct")
+HF_TOKEN = os.getenv("HF_TOKEN")
 BENCHMARK = os.getenv("BENCHMARK", "irctc_booking")
 ENV_BASE_URL = os.getenv("ENV_BASE_URL", "http://localhost:7860")
 LOCAL_IMAGE_NAME = os.getenv("LOCAL_IMAGE_NAME")
@@ -285,12 +285,12 @@ async def run_episode(
 
 
 async def main() -> None:
-    if not OEPNAI_API_KEY:
-        raise RuntimeError("OEPNAI_API_KEY is required for inference")
+    if HF_TOKEN is None:
+        raise ValueError("HF_TOKEN environment variable is required")
 
     llm_client = OpenAI(
         base_url=API_BASE_URL,
-        api_key=OEPNAI_API_KEY,
+        api_key=HF_TOKEN,
     )
 
     if LOCAL_IMAGE_NAME:

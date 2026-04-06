@@ -17,6 +17,6 @@ pre_validation_*.txt
 
 .kiro
 DEPLOY_TO_HF.md
-*_hf.py
+*_openai.py
 .pytest_cache
 .env
