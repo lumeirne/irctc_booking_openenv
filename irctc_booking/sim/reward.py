@@ -34,8 +34,11 @@ class RewardCalculator:
 
         reward += base_penalty
         reward += self._bonus_or_penalty_adjustment(state, previous_state)
-        # Clamp to strictly within (0, 1) — validator rejects 0.0 and 1.0
-        return max(0.01, min(0.99, reward))
+        # Scale dense reward so cumulative episode returns remain within (0, 1).
+        # This keeps each step strictly in-range while avoiding task-score overflow
+        # when validators aggregate step rewards across an episode.
+        scaled_reward = reward / 20.0
+        return max(0.01, min(0.045, scaled_reward))
 
     def _booking_progress(self, state: IrctcBookingState) -> float:
         if not state.passengers:
