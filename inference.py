@@ -80,6 +80,15 @@ def log_end(success: bool, steps: int, rewards: List[float]) -> None:
     )
 
 
+def normalize_reward(raw_reward: Any) -> float:
+    """Keep emitted rewards strictly inside (0, 1)."""
+    try:
+        value = float(raw_reward)
+    except (TypeError, ValueError):
+        value = 0.01
+    return max(0.01, min(0.99, value))
+
+
 def format_action(action_type: str, params: Dict[str, Any]) -> str:
     if not params:
         return f"{action_type}()"
@@ -246,7 +255,7 @@ async def run_episode(
             step_result = await env.step(action)
 
             observation = step_result.observation
-            reward = float(step_result.reward or 0.0)
+            reward = normalize_reward(step_result.reward)
             done = bool(step_result.done)
             err = None
             if isinstance(observation.metadata, dict):
@@ -270,10 +279,12 @@ async def run_episode(
 
     except Exception as exc:
         # Keep evaluator output deterministic and structured.
+        fallback_reward = 0.01
+        rewards.append(fallback_reward)
         log_step(
             steps_taken + 1,
             "internal_error()",
-            0.0,
+            fallback_reward,
             True,
             str(exc),
         )
