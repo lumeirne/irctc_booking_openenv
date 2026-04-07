@@ -290,9 +290,12 @@ async def run_episode(
         )
         success = False
     finally:
-        log_end(success, steps_taken, rewards)
+        # Emit a single per-task score in (0, 1) to avoid ambiguous multi-step aggregation.
+        task_score = normalize_reward(sum(rewards)) if rewards else 0.01
+        log_end(success, steps_taken, [task_score])
 
-    return EpisodeRun(rewards=rewards, steps=steps_taken, success=success)
+    task_score = normalize_reward(sum(rewards)) if rewards else 0.01
+    return EpisodeRun(rewards=[task_score], steps=steps_taken, success=success)
 
 
 async def main() -> None:
