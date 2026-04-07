@@ -21,16 +21,16 @@ class EpisodeGrader:
     ) -> Tuple[float, Dict[str, float]]:
         if self._detect_state_access(trajectory):
             return 0.01, {
-                "final_booking_success": 0.0,
-                "optimality_score": 0.0,
-                "efficiency_score": 0.0,
-                "rule_compliance": 0.0,
+                "final_booking_success": 0.01,
+                "optimality_score": 0.01,
+                "efficiency_score": 0.01,
+                "rule_compliance": 0.01,
             }
 
-        success = self._final_booking_success(final_state)
-        optimality = self._optimality_score(final_state)
-        efficiency = self._efficiency_score(final_state)
-        compliance = self._rule_compliance(final_state)
+        success = self._clamp(self._final_booking_success(final_state))
+        optimality = self._clamp(self._optimality_score(final_state))
+        efficiency = self._clamp(self._efficiency_score(final_state))
+        compliance = self._clamp(self._rule_compliance(final_state))
 
         score = (
             0.40 * success
@@ -38,7 +38,7 @@ class EpisodeGrader:
             + 0.20 * efficiency
             + 0.20 * compliance
         )
-        score = max(0.01, min(0.99, score))
+        score = self._clamp(score)
 
         return score, {
             "final_booking_success": success,
@@ -46,6 +46,11 @@ class EpisodeGrader:
             "efficiency_score": efficiency,
             "rule_compliance": compliance,
         }
+
+    @staticmethod
+    def _clamp(value: float, low: float = 0.01, high: float = 0.99) -> float:
+        """Clamp a score to strictly within (0, 1)."""
+        return max(low, min(high, value))
 
     def _detect_state_access(self, trajectory: List[Dict[str, Any]]) -> bool:
         for step in trajectory:

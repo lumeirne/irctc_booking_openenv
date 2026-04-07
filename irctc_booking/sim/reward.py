@@ -34,7 +34,8 @@ class RewardCalculator:
 
         reward += base_penalty
         reward += self._bonus_or_penalty_adjustment(state, previous_state)
-        return reward
+        # Clamp to strictly within (0, 1) — validator rejects 0.0 and 1.0
+        return max(0.01, min(0.99, reward))
 
     def _booking_progress(self, state: IrctcBookingState) -> float:
         if not state.passengers:

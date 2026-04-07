@@ -91,7 +91,7 @@ class SimEngine:
                 demand_steps=[1, 2, 3, 4, 10, 11, 12, 13],
             )
 
-        obs = self._build_observation(state, "Episode initialized. Start by searching trains.", 0.0)
+        obs = self._build_observation(state, "Episode initialized. Start by searching trains.", 0.01)
         return state, obs
 
     def step(
@@ -101,10 +101,10 @@ class SimEngine:
         action: IrctcBookingAction,
     ) -> Tuple[IrctcBookingObservation, float, bool, Dict[str, Any]]:
         if state.done:
-            obs = self._build_observation(state, "Episode is already complete.", 0.0)
+            obs = self._build_observation(state, "Episode is already complete.", 0.01)
             obs.done = True
-            obs.reward = 0.0
-            return obs, 0.0, True, {"error": "Episode already done"}
+            obs.reward = 0.01
+            return obs, 0.01, True, {"error": "Episode already done"}
 
         previous = state.model_copy(deep=True)
         state.step_count += 1
