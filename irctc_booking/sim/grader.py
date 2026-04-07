@@ -20,7 +20,7 @@ class EpisodeGrader:
         final_state: IrctcBookingState,
     ) -> Tuple[float, Dict[str, float]]:
         if self._detect_state_access(trajectory):
-            return 0.0, {
+            return 0.01, {
                 "final_booking_success": 0.0,
                 "optimality_score": 0.0,
                 "efficiency_score": 0.0,
@@ -38,7 +38,7 @@ class EpisodeGrader:
             + 0.20 * efficiency
             + 0.20 * compliance
         )
-        score = max(0.0, min(1.0, score))
+        score = max(0.01, min(0.99, score))
 
         return score, {
             "final_booking_success": success,
