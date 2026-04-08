@@ -64,7 +64,7 @@ class EpisodeGrader:
 
     def _final_booking_success(self, state: IrctcBookingState) -> float:
         if not state.passengers:
-            return 0.0
+            return self._clamp(0.0)
 
         total = len(state.passengers)
         cnf = 0
@@ -73,26 +73,26 @@ class EpisodeGrader:
                 cnf += len(record.passengers)
 
         if cnf == total:
-            return 1.0
+            return self._clamp(1.0)
         if cnf >= total / 2:
-            return 0.5
-        return 0.0
+            return self._clamp(0.5)
+        return self._clamp(0.0)
 
     def _optimality_score(self, state: IrctcBookingState) -> float:
         gt = self.ground_truth_db.get(state.task_id or -1)
         if gt is None or gt.minimum_fare_inr <= 0:
-            return 0.5
+            return self._clamp(0.5)
 
         ratio = state.total_fare_spent / gt.minimum_fare_inr if gt.minimum_fare_inr > 0 else 9.0
         if ratio <= 1.10:
-            return 1.0
+            return self._clamp(1.0)
         if ratio <= 1.50:
-            return max(0.0, 1.0 - ((ratio - 1.10) / 0.40))
-        return 0.0
+            return self._clamp(1.0 - ((ratio - 1.10) / 0.40))
+        return self._clamp(0.0)
 
     def _efficiency_score(self, state: IrctcBookingState) -> float:
-        return max(0.0, min(1.0, 1.0 - (state.step_count / 20.0)))
+        return self._clamp(1.0 - (state.step_count / 20.0))
 
     def _rule_compliance(self, state: IrctcBookingState) -> float:
         unique_violations = len(set(state.rule_violations))
-        return max(0.0, min(1.0, 1.0 - (0.1 * unique_violations)))
+        return self._clamp(1.0 - (0.1 * unique_violations))
